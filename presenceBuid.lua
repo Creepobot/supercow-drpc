@@ -25,6 +25,7 @@ function HelpMarker(text)
 end
 
 local Filter = {
+	id = "placeholder",
 	name = "", ---@type string
 	hint = "", ---@type string
 	order = 0,
@@ -35,30 +36,32 @@ Filter.__index = Filter
 
 function Filter:DrawUi()
 	local checkbox = ffi.new("bool[1]", self.enabled)
-	if imgui.Checkbox(self.name, checkbox) then
+	if imgui.Checkbox(self.name.."##"..self.id, checkbox) then
 		self.enabled = checkbox[0]
-		config.mod:getObject(self.name):set("enabled", checkbox[0])
+		config.mod:getObject(self.id):set("enabled", checkbox[0])
 		config.save()
 	end
 	if self.hint and self.hint ~= "" then
 		HelpMarker(self.hint) end
 end
 
-function Filter.new()
-    return setmetatable({}, Filter)
+function Filter.new(id)
+	local self = setmetatable({}, Filter)
+	self.id = id
+    return self
 end
 
-local mainIcon = Filter.new()
+local mainIcon = Filter.new("mainIcon")
 mainIcon.name = "Вид иконки"
 mainIcon.hint = "Тут можно выбрать отображаемую иконку игры на свой вкус и цвет"
 mainIcon.enabled = true
 mainIcon.currItem = ffi.new("int[1]", 0)
 mainIcon.DrawUi = function()
-	imgui.Text(mainIcon.name)
+	imgui.Text(mainIcon.name.."##"..mainIcon.id)
 	if mainIcon.hint and mainIcon.hint ~= "" then
 		HelpMarker(mainIcon.hint) end
-	if imgui.Combo_Str("###mainIcon", mainIcon.currItem, "Дефолт\0SuperCow Cowmoonity\0Свидетель Джим\0Мегабаза\0") then
-		config.mod:getObject(mainIcon.name):set("currItem", mainIcon.currItem[0])
+	if imgui.Combo_Str("##"..mainIcon.id, mainIcon.currItem, "Дефолт\0SuperCow Cowmoonity\0Свидетель Джим\0Мегабаза\0") then
+		config.mod:getObject(mainIcon.id):set("currItem", mainIcon.currItem[0])
 		config.save()
 	end
 end
@@ -74,7 +77,7 @@ mainIcon.func = function(prs)
 	return prs
 end
 
-local levelDisplay = Filter.new()
+local levelDisplay = Filter.new("levelDisplay")
 levelDisplay.name = "Отображать уровень"
 levelDisplay.hint = "Показывать уровень на котором находится игрок\nВ меню работает не всегда точно"
 levelDisplay.enabled = true
@@ -84,7 +87,7 @@ levelDisplay.func = function(prs)
 	return prs
 end
 
-local levelPercentage = Filter.new()
+local levelPercentage = Filter.new("levelPercentage")
 levelPercentage.name = "Процент прохождения"
 levelPercentage.hint = "Отображать процент прохождения уровня, если такой имеется"
 levelPercentage.order = 1
@@ -98,8 +101,8 @@ levelPercentage.func = function(prs)
 	return prs
 end
 
-local customText1 = Filter.new()
-customText1.name = "Свой текст "
+local customText1 = Filter.new("customText1")
+customText1.name = "Свой текст"
 customText1.hint = "Панель для ввода статичного текста"
 customText1.order = 2
 customText1.enabled = false
@@ -107,13 +110,13 @@ customText1.text = ""
 customText1.func = function(prs)
 	if customText1.text == "" then goto fucku end
 	table.insert(prs.state, customText1.text)
-	config.mod:getObject(customText1.name):set("text", customText1.text)
+	config.mod:getObject(customText1.id):set("text", customText1.text)
 	config.save()
 	::fucku::
 	return prs
 end
 
-local gameState = Filter.new()
+local gameState = Filter.new("gameState")
 gameState.name = "Отображать статус"
 gameState.hint = "Показывать ли где находится игрок?\nВ меню / в процессе игры / в редакторе"
 gameState.enabled = true
@@ -127,7 +130,7 @@ gameState.func = function(prs)
 	return prs
 end
 
-local editorState = Filter.new()
+local editorState = Filter.new("editorState")
 editorState.name = "Игра в редакторе"
 editorState.hint = "Если происходит тест уровня через редактор, уточнять это"
 editorState.order = 1
@@ -141,7 +144,7 @@ editorState.func = function(prs)
 	return prs
 end
 
-local profileName = Filter.new()
+local profileName = Filter.new("profileName")
 profileName.name = "Имя профиля"
 profileName.hint = "Отображать имя текущего профиля"
 profileName.order = -1
@@ -151,7 +154,7 @@ profileName.func = function(prs)
 	return prs
 end
 
-local customText2 = Filter.new()
+local customText2 = Filter.new("customText2")
 customText2.name = "Свой текст"
 customText2.hint = "Панель для ввода статичного текста"
 customText2.order = 2
@@ -160,13 +163,13 @@ customText2.text = ""
 customText2.func = function(prs)
 	if customText2.text == "" then goto fucku end
 	table.insert(prs.details, customText2.text)
-	config.mod:getObject(customText2.name):set("text", customText2.text)
+	config.mod:getObject(customText2.id):set("text", customText2.text)
 	config.save()
 	::fucku::
 	return prs
 end
 
-local playingStatus = Filter.new()
+local playingStatus = Filter.new("playingStatus")
 playingStatus.name = "Показывать активность"
 playingStatus.hint = "Отображать ли кружок в углу иконки игры в профиле?\nКружок меняет свой цвет в зависимости от того, поставлена ли игра на паузу"
 playingStatus.order = 0
@@ -180,7 +183,7 @@ playingStatus.func = function(prs)
 	return prs
 end
 
-local eblanStatus = Filter.new()
+local eblanStatus = Filter.new("eblanStatus")
 eblanStatus.order = 1
 eblanStatus.enabled = true
 eblanStatus.func = function(prs)
@@ -190,7 +193,7 @@ eblanStatus.func = function(prs)
 	return prs
 end
 
-local rusStatus = Filter.new()
+local rusStatus = Filter.new("rusStatus")
 rusStatus.order = 2
 rusStatus.enabled = true
 rusStatus.func = function(prs)

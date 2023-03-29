@@ -9,13 +9,13 @@ local ffi = require("ffi")
 local buf
 local function ApplyConfig()
     for _, k in pairs(prsBuild.BuildFilters) do
-        if not config.mod:has(k.name) then goto fucku end
-        if config.mod:getObject(k.name):has("enabled") then
-            k.enabled = config.mod:getObject(k.name):getBool("enabled") end
-        if config.mod:getObject(k.name):has("text") then
-            k.text = config.mod:getObject(k.name):getString("text") end
-        if config.mod:getObject(k.name):has("currItem") then
-            k.currItem = ffi.new("int[1]", config.mod:getObject(k.name):getNumber("currItem")) end
+        if not config.mod:has(k.id) then goto fucku end
+        if config.mod:getObject(k.id):has("enabled") then
+            k.enabled = config.mod:getObject(k.id):getBool("enabled") end
+        if config.mod:getObject(k.id):has("text") then
+            k.text = config.mod:getObject(k.id):getString("text") end
+        if config.mod:getObject(k.id):has("currItem") then
+            k.currItem = ffi.new("int[1]", config.mod:getObject(k.id):getNumber("currItem")) end
         ::fucku::
     end
     if config.mod:has("refreshInterval") then
@@ -129,7 +129,7 @@ function renderUi()
             if prsBuild.BuildFilters.CustomText2.enabled then
                 imgui.Indent()
                 local text = ffi.new("char[32]", prsBuild.BuildFilters.CustomText2.text)
-                if imgui.InputText("###customText2", text, 32) then
+                if imgui.InputText("###customTextbox2", text, 32) then
                     prsBuild.BuildFilters.CustomText2.text = ffi.string(text)
                 end
                 imgui.Unindent()
@@ -149,7 +149,7 @@ function renderUi()
             if prsBuild.BuildFilters.CustomText1.enabled then
                 imgui.Indent()
                 local text = ffi.new("char[32]", prsBuild.BuildFilters.CustomText1.text)
-                if imgui.InputText("###customText1", text, 32) then
+                if imgui.InputText("###customTextbox1", text, 32) then
                     prsBuild.BuildFilters.CustomText1.text = ffi.string(text)
                 end
                 imgui.Unindent()
