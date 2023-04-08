@@ -197,9 +197,13 @@ local rusStatus = Filter.new("rusStatus")
 rusStatus.order = 2
 rusStatus.enabled = true
 rusStatus.func = function(prs)
-	local lang = memory.toStr(addrs.language:readAs("char*"))
-	if lang == "ru" and not addrs.loaded:readBool() then
-		prs.smallImageKey = "rus" prs.smallImageText = "ПОЛНОСТЬЮ НА РУССКОМ ЯЗЫКЕ"
+	if addrs.language ~= nil and not addrs.loaded:readBool() then
+		local lang = memory.toStr(addrs.language:readAs("char*"))
+		if lang == "ru" then
+			prs.smallImageKey = "rus" prs.smallImageText = "ПОЛНОСТЬЮ НА РУССКОМ ЯЗЫКЕ"
+		end
+	else
+		rusStatus.enabled = false
 	end
 	return prs
 end

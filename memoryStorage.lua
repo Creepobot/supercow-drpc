@@ -13,7 +13,6 @@ local Addresses = {
     editor = memory.at("0F B6 15 ? ? ? ? 85 D2 75 ? C7 05"):add(3):readOffset(),
     loaded = memory.at("0F B6 15 ? ? ? ? 85 D2 74 ? C7 45 ? ? ? ? ? A1"):add(3):readOffset(),
     currentName = memory.at("8B 15 ? ? ? ? 83 7A ? ? 7D"):add(2),
-    language = memory.at("68 ? ? ? ? 68 ? ? ? ? 8D 8D ? ? ? ? 51 E8 ? ? ? ? 83 C4 ? 8D 95"):add(1),
 
     coinsTotal = memory.at("3B 15 ? ? ? ? 7C ? 6A"):add(2):readOffset(),
     coinsCollected = memory.at("83 3D ? ? ? ? ? 7C ? 8B 15 ? ? ? ? 3B 15"):add(2):readOffset(),
@@ -25,6 +24,12 @@ local Addresses = {
     secretsFound = memory.at("83 3D ? ? ? ? ? 7C ? 6A"):add(2):readOffset()
 }
 
+local langbool
+langbool, Addresses.language = pcall(function() return memory.at("68 ? ? ? ? 68 ? ? ? ? 8D 8D ? ? ? ? 51 E8 ? ? ? ? 83 C4 ? 8D 95"):add(1) end)
+if not langbool then
+    Addresses.language = nil
+    log.warn("Ошибка выше возникла в модуле DRPC. Не обращайте внимания, на работу супермода, самого DRPC или других модулей это не влияет.")
+end
 
 Addresses.calculateStats = function()
     local coinsTotal, coinsCollected, gemsTotal,
